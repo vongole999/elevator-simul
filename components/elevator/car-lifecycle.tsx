@@ -122,9 +122,15 @@ export function CarLifecycle({
       default:
         return;
     }
+    // car.carFloor는 의도적으로 뺐다 — 이동 중(travelingToDestination)에는
+    // ADVANCE_CAR가 한 층씩 지날 때마다 carFloor를 바꾸는데, 이 effect가
+    // carFloor에 반응하면 phase는 그대로인데도 매 층 재실행되어 안내
+    // 음성이 층마다 반복 재생된다. idle 분기가 참조하는 car.carFloor는
+    // idle 진입 시점에 캡처된 값으로 충분하다 — idle 동안은 카가 멈춰
+    // 있어 carFloor가 바뀌지 않는다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     car.phase,
-    car.carFloor,
     car.travelDirection,
     carIndex,
     isActive,
