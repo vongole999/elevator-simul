@@ -1,3 +1,5 @@
+import type { Language } from "./types";
+
 /**
  * 층 번호를 화면에 보여줄 문구로 바꾼다.
  *
@@ -8,8 +10,15 @@ export function formatFloorLabel(floor: number): string {
   return floor > 0 ? String(floor) : `B${-floor}`;
 }
 
-/** 안내 음성에서 층을 읽는 방식. "지하 2층입니다"처럼 자연스럽게 읽도록 표기와 다르게 둔다. */
-export function formatFloorSpeech(floor: number): string {
+/**
+ * 안내 음성에서 층을 읽는 방식. 화면 표기(B2)를 글자 그대로 읽지 않고
+ * "지하 2층"/"Basement 2"처럼 각 언어로 자연스럽게 읽는다
+ * (docs/specs/english-guidance-voice/spec.md "가정").
+ */
+export function formatFloorSpeech(floor: number, language: Language): string {
+  if (language === "en") {
+    return floor > 0 ? `Floor ${floor}` : `Basement ${-floor}`;
+  }
   return floor > 0 ? `${floor}층` : `지하 ${-floor}층`;
 }
 

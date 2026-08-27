@@ -14,7 +14,7 @@ interface LanguagePickerProps {
   onChange: (language: Language) => void;
 }
 
-/** 안내 언어를 고른다. 실제 안내 음성은 아직 한국어로 고정이다(가정 참고). */
+/** 안내 언어를 고른다. 고른 언어로 실제 음성 안내가 난다. */
 export function LanguagePicker({ value, onChange }: LanguagePickerProps) {
   return (
     <div className="flex gap-2" role="radiogroup" aria-label="안내 언어">

@@ -1,7 +1,7 @@
 import type { ElevatorTheme } from "@/components/elevator/theme";
+import type { Language } from "@/components/elevator/types";
 
-/** 안내 언어. 이번 스펙에서는 실제 안내 음성은 한국어로 고정이고, 값만 저장한다. */
-export type Language = "ko" | "en";
+export type { Language };
 
 /** 아이가 설정 화면에서 만드는 건물. */
 export interface BuildingConfig {
