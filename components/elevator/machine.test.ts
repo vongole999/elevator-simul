@@ -135,7 +135,7 @@ describe("elevatorReducer — 카 한 대짜리 건물의 한 바퀴", () => {
     expect(next.cars[0].phase).toBe("doorsClosing");
   });
 
-  it("닫히는 중 열림 버튼을 누르면 다시 열리고 기다림이 처음부터 시작된다", () => {
+  it("닫히는 중 열림 버튼을 누르면 목적층 이동을 포기하고 지금 층에서 내린다", () => {
     const state = withCar(
       { ...baseState(), activeCarIndex: 0 },
       0,
@@ -143,11 +143,12 @@ describe("elevatorReducer — 카 한 대짜리 건물의 한 바퀴", () => {
     );
     const next = elevatorReducer(state, { type: "PRESS_OPEN_DOOR" });
 
-    expect(next.cars[0].phase).toBe("closeCountdown");
+    expect(next.cars[0].phase).toBe("destinationDoorsOpen");
+    expect(next.cars[0].destinationFloor).toBeNull();
     expect(isDoorsOpen(next.cars[0].phase)).toBe(true);
   });
 
-  it("목적층 없이 닫힌 뒤 열림 버튼을 누르면 층 버튼을 다시 고를 수 있는 상태로 열린다", () => {
+  it("목적층 없이 닫히는 중 열림 버튼을 누르면 그냥 지금 층에서 내린다", () => {
     const state = withCar(
       { ...baseState(), activeCarIndex: 0 },
       0,
@@ -155,7 +156,7 @@ describe("elevatorReducer — 카 한 대짜리 건물의 한 바퀴", () => {
     );
     const next = elevatorReducer(state, { type: "PRESS_OPEN_DOOR" });
 
-    expect(next.cars[0].phase).toBe("boardingDoorsOpen");
+    expect(next.cars[0].phase).toBe("destinationDoorsOpen");
   });
 
   it("문이 닫히면 목적층 방향으로 이동을 시작한다", () => {
@@ -195,11 +196,11 @@ describe("elevatorReducer — 카 한 대짜리 건물의 한 바퀴", () => {
     expect(isDoorsOpen(next.cars[0].phase)).toBe(false);
   });
 
-  it("문이 닫힌 채 기다리는 중에도 열림 버튼을 누르면 다시 열어 준다", () => {
+  it("문이 닫힌 채 기다리는 중에도 열림 버튼을 누르면 그냥 지금 층에서 내린다", () => {
     const state = withCar({ ...baseState(), activeCarIndex: 0 }, 0, { phase: "closedWaitingForFloor" });
     const next = elevatorReducer(state, { type: "PRESS_OPEN_DOOR" });
 
-    expect(next.cars[0].phase).toBe("boardingDoorsOpen");
+    expect(next.cars[0].phase).toBe("destinationDoorsOpen");
     expect(isDoorsOpen(next.cars[0].phase)).toBe(true);
   });
 

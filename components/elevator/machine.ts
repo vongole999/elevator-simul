@@ -278,21 +278,21 @@ export function elevatorReducer(
     case "PRESS_OPEN_DOOR": {
       if (state.activeCarIndex === null) return state;
       const car = state.cars[state.activeCarIndex];
-      // "닫히던 문이 다시 열리고 기다림이 처음부터 다시 시작된다" — doorsClosing일 때만 의미가 있다.
-      if (car.phase === "doorsClosing") {
+      // 열림 버튼은 doorsClosing·closedWaitingForFloor에서만 눌린다(문이
+      // 이미 열려 있으면 버튼 자체가 disabled). 두 상태 모두 아직 목적층을
+      // 향해 실제로 출발하지 않았으므로, 열림 버튼을 누르면 그 이동을
+      // 포기하고 지금 이 층(탑승한 층)에서 곧장 내리는 것으로 본다.
+      // destinationDoorsOpen으로 보내 목적층에 도착했을 때와 같은 흐름
+      // (도착 안내 → 잠시 뒤 alightingDoorsOpen → idle)을 그대로 탄다.
+      if (car.phase === "doorsClosing" || car.phase === "closedWaitingForFloor") {
         return {
           ...state,
           cars: replaceCarAt(state.cars, state.activeCarIndex, (c) => ({
             ...c,
-            phase: c.destinationFloor !== null ? "closeCountdown" : "boardingDoorsOpen",
+            phase: "destinationDoorsOpen",
+            destinationFloor: null,
+            travelDirection: null,
           })),
-        };
-      }
-      // 문이 닫힌 채 목적층을 기다리던 중에도 다시 열어줄 수 있다.
-      if (car.phase === "closedWaitingForFloor") {
-        return {
-          ...state,
-          cars: replaceCarAt(state.cars, state.activeCarIndex, (c) => ({ ...c, phase: "boardingDoorsOpen" })),
         };
       }
       return state;
