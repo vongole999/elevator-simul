@@ -11,7 +11,11 @@ const SEGMENT_RECTS: Record<string, { x: number; y: number; width: number; heigh
   g: { x: 6, y: 24, width: 18, height: 6 },
 };
 
-/** 문자마다 켜야 할 세그먼트. 대문자 B는 7세그먼트로 표현할 수 없어 관행대로 소문자 b 모양을 쓴다. */
+/**
+ * 문자마다 켜야 할 세그먼트. 지하 표시 "B"는 7세그먼트로는 소문자 b
+ * 모양(관행)으로만 그릴 수 있어 대문자로 읽히지 않으므로, 이 디스플레이에
+ * 태우지 않고 FloorIndicator에서 별도 문자로 그린다.
+ */
 const CHAR_SEGMENTS: Record<string, string[]> = {
   "0": ["a", "b", "c", "d", "e", "f"],
   "1": ["b", "c"],
@@ -23,7 +27,6 @@ const CHAR_SEGMENTS: Record<string, string[]> = {
   "7": ["a", "b", "c"],
   "8": ["a", "b", "c", "d", "e", "f", "g"],
   "9": ["a", "b", "c", "d", "f", "g"],
-  B: ["f", "e", "g", "c", "d"],
   "-": ["g"],
   " ": [],
 };

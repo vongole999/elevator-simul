@@ -1,11 +1,14 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { Settings } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 import { CabinScene } from "./cabin-scene";
 import { CarLifecycle } from "./car-lifecycle";
+import { formatFloorWord } from "./floor-format";
 import { LobbyScene } from "./lobby-scene";
 import type { ElevatorTheme } from "./theme";
 import { useElevator } from "./use-elevator";
@@ -54,6 +57,11 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
   );
 
   const activeCar = state.activeCarIndex !== null ? state.cars[state.activeCarIndex] : null;
+  // 설정 화면으로 돌아가는 것은 호출을 기다리는 동안에만 허용한다 — 엘리베이터가
+  // 응답하는 중에 건물을 바꾸면 진행 중이던 동작이 애매해진다
+  // (docs/specs/building-setup/spec.md "가정").
+  const canOpenSettings = state.view === "lobby" && state.activeCarIndex === null;
+  const title = state.view === "lobby" ? `${formatFloorWord(state.standingFloor)} 로비` : "엘리베이터";
 
   return (
     <>
@@ -72,10 +80,13 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
 
       <Card className={cn("w-full", CARD_MAX_WIDTH_CLASS[carCount] ?? "max-w-5xl")}>
         <CardHeader className="flex-row items-center justify-between">
-          <h1 className="font-heading text-base font-medium">엘리베이터</h1>
-          <Badge variant={state.view === "lobby" ? "secondary" : "default"}>
-            {state.view === "lobby" ? "로비" : "탑승 중"}
-          </Badge>
+          <h1 className="font-heading text-base font-medium">{title}</h1>
+          {canOpenSettings && (
+            <Button type="button" variant="outline" size="sm" onClick={onOpenSettings}>
+              <Settings className="size-4" />
+              설정
+            </Button>
+          )}
         </CardHeader>
         <CardContent className="flex items-center justify-center pt-2 pb-6">
           {state.view === "lobby" ? (
@@ -88,12 +99,12 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
               callActive={state.callActive}
               theme={theme}
               onCall={call}
-              onOpenSettings={onOpenSettings}
             />
           ) : (
             activeCar && (
               <CabinScene
                 car={activeCar}
+                carIndex={state.activeCarIndex ?? 0}
                 topFloor={topFloor}
                 bottomFloor={bottomFloor}
                 theme={theme}
