@@ -2,7 +2,8 @@
 
 import { useReducer } from "react";
 
-import { primeGuidanceAudio } from "./guidance-sound";
+import { formatFloorSpeech } from "./floor-format";
+import { primeGuidanceAudio, speak } from "./guidance-sound";
 import { createInitialElevatorState, elevatorReducer } from "./machine";
 import type { Direction, ElevatorAction, ElevatorState } from "./types";
 
@@ -40,6 +41,9 @@ export function useElevator(topFloor: number, bottomFloor: number, carCount: num
   }
 
   function selectFloor(floor: number) {
+    // 버튼을 누른 층 버튼이 disabled가 아닐 때만 이 함수가 불리므로(cabin-scene.tsx),
+    // 항상 유효한 선택이다 — 무효한 선택을 걸러내는 검사는 reducer 쪽에 이미 있다.
+    speak(`${formatFloorSpeech(floor)} 눌렀습니다`);
     dispatch({ type: "SELECT_FLOOR", floor });
   }
 
