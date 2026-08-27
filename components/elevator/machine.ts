@@ -1,15 +1,23 @@
-import { BOTTOM_FLOOR, START_FLOOR, TOP_FLOOR } from "./constants";
+import { START_FLOOR } from "./constants";
 import type { ElevatorAction, ElevatorPhase, ElevatorState } from "./types";
 
-export const initialElevatorState: ElevatorState = {
-  standingFloor: START_FLOOR,
-  carFloor: START_FLOOR,
-  phase: "idle",
-  view: "lobby",
-  callActive: false,
-  destinationFloor: null,
-  travelDirection: null,
-};
+/** topFloor·bottomFloor짜리 건물의 처음 상태를 만든다. 항상 지상 1층에서 시작한다. */
+export function createInitialElevatorState(
+  topFloor: number,
+  bottomFloor: number
+): ElevatorState {
+  return {
+    topFloor,
+    bottomFloor,
+    standingFloor: START_FLOOR,
+    carFloor: START_FLOOR,
+    phase: "idle",
+    view: "lobby",
+    callActive: false,
+    destinationFloor: null,
+    travelDirection: null,
+  };
+}
 
 /** 문이 열려 있어야 하는 단계인지. 문 애니메이션은 이 값 하나로만 구동한다. */
 export function isDoorsOpen(phase: ElevatorPhase): boolean {
@@ -17,7 +25,8 @@ export function isDoorsOpen(phase: ElevatorPhase): boolean {
     phase === "pickupDoorsOpen" ||
     phase === "boardingDoorsOpen" ||
     phase === "closeCountdown" ||
-    phase === "destinationDoorsOpen"
+    phase === "destinationDoorsOpen" ||
+    phase === "alightingDoorsOpen"
   );
 }
 
@@ -29,6 +38,15 @@ export function isCarTraveling(phase: ElevatorPhase): boolean {
 function directionTo(from: number, to: number): "up" | "down" | null {
   if (to === from) return null;
   return to > from ? "up" : "down";
+}
+
+/**
+ * 층을 한 칸 옮긴다. 0층은 없으므로(1층 바로 아래는 -1) 0을 지나게 되면
+ * 한 칸 더 옮겨 건너뛴다.
+ */
+function stepFloor(current: number, step: 1 | -1): number {
+  const next = current + step;
+  return next === 0 ? next + step : next;
 }
 
 export function elevatorReducer(
@@ -59,7 +77,7 @@ export function elevatorReducer(
       if (target === null) return state;
 
       const step = target > state.carFloor ? 1 : -1;
-      const nextCarFloor = state.carFloor + step;
+      const nextCarFloor = stepFloor(state.carFloor, step);
 
       if (nextCarFloor !== target) {
         return { ...state, carFloor: nextCarFloor };
@@ -91,36 +109,61 @@ export function elevatorReducer(
     }
 
     case "SELECT_FLOOR": {
-      if (state.phase !== "boardingDoorsOpen") return state;
-      if (action.floor < BOTTOM_FLOOR || action.floor > TOP_FLOOR) return state;
+      if (state.phase !== "boardingDoorsOpen" && state.phase !== "closedWaitingForFloor") {
+        return state;
+      }
+      if (action.floor === 0) return state;
+      if (action.floor < -state.bottomFloor || action.floor > state.topFloor) return state;
       // 지금 있는 층을 다시 누르는 조작은 두지 않는다(이동할 곳이 없다).
       if (action.floor === state.carFloor) return state;
+
+      if (state.phase === "closedWaitingForFloor") {
+        // 문이 이미 닫혀 있으니 다시 여닫을 필요 없이 곧바로 움직인다.
+        return {
+          ...state,
+          phase: "travelingToDestination",
+          destinationFloor: action.floor,
+          travelDirection: directionTo(state.carFloor, action.floor),
+        };
+      }
       return { ...state, phase: "closeCountdown", destinationFloor: action.floor };
     }
 
     case "PRESS_CLOSE_DOOR": {
+      // 목적층을 고르기 전이라도 닫을 수 있다 — 실제 엘리베이터도 그렇다.
       if (state.phase !== "boardingDoorsOpen" && state.phase !== "closeCountdown") {
         return state;
       }
-      // 목적층을 고르기 전에는 닫아도 갈 곳이 없으므로 누르지 못하게 막는다.
-      if (state.destinationFloor === null) return state;
       return { ...state, phase: "doorsClosing" };
     }
 
     case "PRESS_OPEN_DOOR": {
       // "닫히던 문이 다시 열리고 기다림이 처음부터 다시 시작된다" — doorsClosing일 때만 의미가 있다.
-      if (state.phase !== "doorsClosing") return state;
-      return { ...state, phase: "closeCountdown" };
+      if (state.phase === "doorsClosing") {
+        return { ...state, phase: state.destinationFloor !== null ? "closeCountdown" : "boardingDoorsOpen" };
+      }
+      // 문이 닫힌 채 층 버튼을 기다리던 중에도 다시 열어줄 수 있다.
+      if (state.phase === "closedWaitingForFloor") {
+        return { ...state, phase: "boardingDoorsOpen" };
+      }
+      return state;
     }
 
     case "AUTO_CLOSE_TIMEOUT": {
-      if (state.phase !== "closeCountdown") return state;
+      // 층 버튼을 고르지 않고 방치해도(boardingDoorsOpen), 골라서 기다리는 중이어도
+      // (closeCountdown) 시간이 지나면 저절로 닫히기 시작한다.
+      if (state.phase !== "boardingDoorsOpen" && state.phase !== "closeCountdown") {
+        return state;
+      }
       return { ...state, phase: "doorsClosing" };
     }
 
     case "DOORS_CLOSED": {
       if (state.phase !== "doorsClosing") return state;
-      if (state.destinationFloor === null) return state;
+      // 목적층 없이 닫혔으면 그 자리에 선 채 층 버튼을 기다린다.
+      if (state.destinationFloor === null) {
+        return { ...state, phase: "closedWaitingForFloor" };
+      }
       return {
         ...state,
         phase: "travelingToDestination",
@@ -128,9 +171,15 @@ export function elevatorReducer(
       };
     }
 
-    case "ALIGHTING_TIMEOUT": {
+    case "ALIGHTED": {
+      // 목적층 문이 열린 채 잠시 지나면 화면은 로비로 바뀌지만, 문은 아직 열려 있다.
       if (state.phase !== "destinationDoorsOpen") return state;
-      return { ...state, phase: "idle", view: "lobby" };
+      return { ...state, phase: "alightingDoorsOpen", view: "lobby" };
+    }
+
+    case "ALIGHTING_DOORS_TIMEOUT": {
+      if (state.phase !== "alightingDoorsOpen") return state;
+      return { ...state, phase: "idle" };
     }
 
     default:

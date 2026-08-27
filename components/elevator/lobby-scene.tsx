@@ -1,34 +1,52 @@
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
-import { BOTTOM_FLOOR, TOP_FLOOR } from "./constants";
 import { DoorPanel } from "./door-panel";
 import { FloorIndicator } from "./floor-indicator";
+import { formatFloorLabel } from "./floor-format";
 import { isDoorsOpen } from "./machine";
+import { PanelButton } from "./panel-button";
+import type { ElevatorTheme } from "./theme";
 import type { Direction, ElevatorState } from "./types";
 
 interface LobbySceneProps {
   state: ElevatorState;
+  theme: ElevatorTheme;
   onCall: (direction: Direction) => void;
+  onOpenSettings: () => void;
 }
 
 /** 아이가 서 있는 층의 로비에서 엘리베이터 문을 바라보는 시점. */
-export function LobbyScene({ state, onCall }: LobbySceneProps) {
+export function LobbyScene({ state, theme, onCall, onOpenSettings }: LobbySceneProps) {
   const canCall = state.phase === "idle";
-  const canCallUp = state.standingFloor < TOP_FLOOR;
-  const canCallDown = state.standingFloor > BOTTOM_FLOOR;
+  const canCallUp = state.standingFloor < state.topFloor;
+  const canCallDown = state.standingFloor > -state.bottomFloor;
+  const standingLabel = formatFloorLabel(state.standingFloor);
+  const standingWord = state.standingFloor > 0 ? `${standingLabel}층` : standingLabel;
 
   return (
     <div className="flex w-full max-w-sm flex-col items-center gap-6">
-      <p className="text-sm text-muted-foreground">{state.standingFloor}층 로비</p>
+      <div className="flex w-full items-center justify-between">
+        <span className="text-sm text-muted-foreground">{standingWord} 로비</span>
+        {canCall && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={onOpenSettings}
+            aria-label="건물 설정으로 돌아가기"
+          >
+            <Settings className="size-4" />
+          </Button>
+        )}
+      </div>
 
-      <DoorPanel open={isDoorsOpen(state.phase)} className="max-w-xs" />
+      <DoorPanel open={isDoorsOpen(state.phase)} theme={theme} scene="lobby" className="max-w-xs" />
 
-      <FloorIndicator floor={state.carFloor} direction={state.travelDirection} />
+      <FloorIndicator floor={state.carFloor} direction={state.travelDirection} theme={theme} />
 
-      <div className="flex flex-col gap-2" role="group" aria-label="호출 버튼">
+      <div className="flex flex-col gap-3" role="group" aria-label="호출 버튼">
         {canCallUp && (
           <CallButton
             direction="up"
@@ -62,17 +80,20 @@ function CallButton({ direction, active, disabled, onPress }: CallButtonProps) {
   const label = direction === "up" ? "위로 호출" : "아래로 호출";
 
   return (
-    <Button
-      type="button"
-      size="lg"
-      variant={active ? "default" : "outline"}
-      disabled={disabled}
-      onClick={onPress}
-      aria-pressed={active}
-      className={cn("h-14 w-40 gap-2 text-base", active && "ring-2 ring-primary/50")}
-    >
-      <Icon className="size-5" />
-      {label}
-    </Button>
+    <div className="flex items-center gap-3">
+      <PanelButton
+        size="lg"
+        active={active}
+        disabled={disabled}
+        onClick={onPress}
+        aria-pressed={active}
+        aria-label={label}
+      >
+        <Icon className="size-6" />
+      </PanelButton>
+      <span className="text-sm font-medium text-muted-foreground">
+        {direction === "up" ? "올라가는 방향" : "내려가는 방향"}
+      </span>
+    </div>
   );
 }

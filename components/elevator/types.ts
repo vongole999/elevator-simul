@@ -9,10 +9,13 @@ export type ViewMode = "lobby" | "cabin";
  *
  * idle → travelingToPickup → pickupDoorsOpen → boardingDoorsOpen
  *   → closeCountdown → doorsClosing → travelingToDestination
- *   → destinationDoorsOpen → idle (반복)
+ *   → destinationDoorsOpen → alightingDoorsOpen → idle (반복)
  *
  * 카가 호출한 층에 이미 있으면 travelingToPickup을 건너뛰고 곧바로
- * pickupDoorsOpen으로 들어간다.
+ * pickupDoorsOpen으로 들어간다. boardingDoorsOpen·closeCountdown 모두
+ * 층 버튼 없이 시간이 지나거나 닫힘 버튼을 누르면 doorsClosing으로
+ * 가는데, 목적층이 없으면 문만 닫히고 closedWaitingForFloor에서 층
+ * 버튼을 기다린다.
  */
 export type ElevatorPhase =
   | "idle"
@@ -21,11 +24,17 @@ export type ElevatorPhase =
   | "boardingDoorsOpen"
   | "closeCountdown"
   | "doorsClosing"
+  | "closedWaitingForFloor"
   | "travelingToDestination"
-  | "destinationDoorsOpen";
+  | "destinationDoorsOpen"
+  | "alightingDoorsOpen";
 
 export interface ElevatorState {
-  /** 바깥 시점일 때 보여줄, 아이가 서 있는 층. */
+  /** 이 건물의 최상층(지상 층수). */
+  topFloor: number;
+  /** 이 건물의 지하 층수(0이면 지하 없음). 최하층은 -bottomFloor다. */
+  bottomFloor: number;
+  /** 바깥 시점일 때 보여줄, 아이가 서 있는 층. 0은 없다(1층 바로 아래는 -1). */
   standingFloor: number;
   /** 카가 지금 있는 층. 이동 중에는 한 층씩 갱신된다. */
   carFloor: number;
@@ -50,4 +59,5 @@ export type ElevatorAction =
   | { type: "BOARDING_TIMEOUT" }
   | { type: "AUTO_CLOSE_TIMEOUT" }
   | { type: "DOORS_CLOSED" }
-  | { type: "ALIGHTING_TIMEOUT" };
+  | { type: "ALIGHTED" }
+  | { type: "ALIGHTING_DOORS_TIMEOUT" };
