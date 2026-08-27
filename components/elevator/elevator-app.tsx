@@ -11,6 +11,7 @@ import { CarLifecycle } from "./car-lifecycle";
 import { formatFloorWord } from "./floor-format";
 import { LobbyScene } from "./lobby-scene";
 import type { ElevatorTheme } from "./theme";
+import type { Language } from "./types";
 import { useElevator } from "./use-elevator";
 
 export interface ElevatorAppProps {
@@ -22,6 +23,8 @@ export interface ElevatorAppProps {
   carCount: number;
   /** 엘리베이터 인테리어 분위기. */
   theme: ElevatorTheme;
+  /** 안내 음성 언어. */
+  language: Language;
   /** 로비에서 설정 버튼을 눌렀을 때. */
   onOpenSettings: () => void;
 }
@@ -51,11 +54,19 @@ const CARD_MAX_WIDTH_CLASS: Record<number, string> = {
  * topFloor·bottomFloor·carCount는 마운트 시점의 값으로 고정되므로, 건물을
  * 바꿀 때는 이 컴포넌트를 다시 마운트한다(예: 상위에서 key를 바꿔준다).
  */
-export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSettings }: ElevatorAppProps) {
+export function ElevatorApp({
+  topFloor,
+  bottomFloor,
+  carCount,
+  theme,
+  language,
+  onOpenSettings,
+}: ElevatorAppProps) {
   const { state, dispatch, call, selectFloor, pressOpenDoor, pressCloseDoor } = useElevator(
     topFloor,
     bottomFloor,
-    carCount
+    carCount,
+    language
   );
 
   const activeCar = state.activeCarIndex !== null ? state.cars[state.activeCarIndex] : null;
@@ -82,6 +93,7 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
           standingFloor={state.standingFloor}
           topFloor={topFloor}
           bottomFloor={bottomFloor}
+          language={language}
           dispatch={dispatch}
         />
       ))}

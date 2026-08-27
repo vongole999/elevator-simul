@@ -1,6 +1,9 @@
 /** 엘리베이터가 움직이는 방향. */
 export type Direction = "up" | "down";
 
+/** 안내 음성 언어. building-setup 화면에서 고르고, 안내 문구·음성 선택에 쓴다. */
+export type Language = "ko" | "en";
+
 /** 아이가 지금 보고 있는 화면 시점. */
 export type ViewMode = "lobby" | "cabin";
 

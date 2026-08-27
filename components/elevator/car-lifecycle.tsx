@@ -10,10 +10,10 @@ import {
   DOORS_OPEN_WAIT_MS,
   FLOOR_TRAVEL_MS,
 } from "./constants";
-import { formatFloorSpeech } from "./floor-format";
+import { arrivalPhrase, doorsClosingPhrase, doorsOpeningPhrase, travelDirectionPhrase } from "./guidance-phrases";
 import { isCarTraveling } from "./machine";
 import { playArrivalChime, speak } from "./guidance-sound";
-import type { CarState, ElevatorAction } from "./types";
+import type { CarState, ElevatorAction, Language } from "./types";
 
 export interface CarLifecycleProps {
   car: CarState;
@@ -24,6 +24,8 @@ export interface CarLifecycleProps {
   standingFloor: number;
   topFloor: number;
   bottomFloor: number;
+  /** 안내 음성 언어. */
+  language: Language;
   dispatch: Dispatch<ElevatorAction>;
 }
 
@@ -46,6 +48,7 @@ export function CarLifecycle({
   standingFloor,
   topFloor,
   bottomFloor,
+  language,
   dispatch,
 }: CarLifecycleProps) {
   // 단계에 처음 들어설 때 한 번만 일어나는 안내 소리와 대기 타이머.
@@ -54,7 +57,7 @@ export function CarLifecycle({
       case "pickupDoorsOpen": {
         if (isActive) {
           playArrivalChime();
-          speak("문이 열립니다");
+          speak(doorsOpeningPhrase(language), language);
         }
         const timer = window.setTimeout(
           () => dispatch({ type: "BOARDING_TIMEOUT", carIndex }),
@@ -73,7 +76,7 @@ export function CarLifecycle({
         return () => window.clearTimeout(timer);
       }
       case "doorsClosing": {
-        if (isActive) speak("문이 닫힙니다");
+        if (isActive) speak(doorsClosingPhrase(language), language);
         const timer = window.setTimeout(
           () => dispatch({ type: "DOORS_CLOSED", carIndex }),
           DOOR_ANIMATION_MS
@@ -82,15 +85,15 @@ export function CarLifecycle({
       }
       case "travelingToDestination": {
         if (isActive && car.travelDirection) {
-          speak(car.travelDirection === "up" ? "올라갑니다" : "내려갑니다");
+          speak(travelDirectionPhrase(language, car.travelDirection), language);
         }
         return;
       }
       case "destinationDoorsOpen": {
         if (isActive) {
           playArrivalChime();
-          speak(`${formatFloorSpeech(standingFloor)}입니다`);
-          speak("문이 열립니다");
+          speak(arrivalPhrase(language, standingFloor), language);
+          speak(doorsOpeningPhrase(language), language);
         }
         const timer = window.setTimeout(
           () => dispatch({ type: "ALIGHTED", carIndex }),
@@ -101,7 +104,7 @@ export function CarLifecycle({
       case "alightingDoorsOpen": {
         // 아이가 이미 내렸거나(활성 카) 가상의 승객이 내린 뒤라(자율 운행 카)
         // 별도 조작 없이 저절로 닫힌다.
-        if (isActive) speak("문이 닫힙니다");
+        if (isActive) speak(doorsClosingPhrase(language), language);
         const timer = window.setTimeout(
           () => dispatch({ type: "ALIGHTING_DOORS_TIMEOUT", carIndex }),
           ALIGHTING_DOOR_WAIT_MS
@@ -137,6 +140,7 @@ export function CarLifecycle({
     standingFloor,
     topFloor,
     bottomFloor,
+    language,
     dispatch,
   ]);
 
