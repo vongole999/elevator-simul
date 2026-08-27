@@ -21,7 +21,8 @@ describe("ElevatorSimulator", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "시작" }));
 
-    expect(screen.getByRole("heading", { name: "엘리베이터" })).toBeInTheDocument();
+    // 새 건물은 항상 지상 1층에서 시작하므로(single-elevator-round-trip spec), 헤더도 "1층 로비"다.
+    expect(screen.getByRole("heading", { name: "1층 로비" })).toBeInTheDocument();
     expect(window.localStorage.getItem("elevator-simul:building-config")).not.toBeNull();
   });
 
@@ -30,7 +31,8 @@ describe("ElevatorSimulator", () => {
 
     render(<ElevatorSimulator />);
 
-    expect(screen.getByRole("heading", { name: "엘리베이터" })).toBeInTheDocument();
+    // 저장된 건물도 1층 로비에서 시작한다.
+    expect(screen.getByRole("heading", { name: "1층 로비" })).toBeInTheDocument();
     // 15층 건물이니 최상층 호출 버튼이 나온다(BOTTOM_FLOOR 기반 판정이 아니라
     // 저장된 topFloor가 실제로 반영됐는지 확인하는 것).
     expect(screen.getByRole("button", { name: /위로 호출/ })).toBeInTheDocument();
@@ -40,7 +42,7 @@ describe("ElevatorSimulator", () => {
     saveBuildingConfig({ topFloor: 12, bottomFloor: 1, elevatorCount: 3, theme: "classic", language: "ko" });
     render(<ElevatorSimulator />);
 
-    fireEvent.click(screen.getByRole("button", { name: "건물 설정으로 돌아가기" }));
+    fireEvent.click(screen.getByRole("button", { name: "설정" }));
 
     expect(screen.getByRole("heading", { name: "건물 만들기" })).toBeInTheDocument();
     expect(screen.getByText("12")).toBeInTheDocument();

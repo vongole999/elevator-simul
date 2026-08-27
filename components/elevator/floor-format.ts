@@ -12,3 +12,13 @@ export function formatFloorLabel(floor: number): string {
 export function formatFloorSpeech(floor: number): string {
   return floor > 0 ? `${floor}층` : `지하 ${-floor}층`;
 }
+
+/**
+ * 화면 문구에서 층을 가리키는 낱말. 지상층은 "1층"처럼 "층"을 붙이고,
+ * 지하는 표기 자체(B1)가 이미 층을 뜻하므로 붙이지 않는다.
+ * 헤더 타이틀·로비 안내문처럼 문장 안에 자연스럽게 넣는 곳에서 쓴다.
+ */
+export function formatFloorWord(floor: number): string {
+  const label = formatFloorLabel(floor);
+  return floor > 0 ? `${label}층` : label;
+}
