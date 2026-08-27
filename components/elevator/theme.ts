@@ -24,6 +24,8 @@ export interface ThemePalette {
   doorColorTo: string;
   /** 문 표면의 대각선 하이라이트(광택). */
   doorHighlight: string;
+  /** 문 표면에 겹치는 미세 텍스처 패턴(반복 그라데이션 CSS 값). 재질감을 낸다. */
+  doorTexture: string;
   /** 문 주변 프레임(벽면) 재질 그라데이션. 층 표시기·레이블이 얹히는 배경이다. */
   frameWallFrom: string;
   frameWallTo: string;
@@ -55,6 +57,7 @@ const THEME_PALETTES: Record<ElevatorTheme, ThemePalette> = {
     doorColorFrom: "#d4d4d4",
     doorColorTo: "#8a8a8a",
     doorHighlight: "rgba(255,255,255,0.55)",
+    doorTexture: "repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 5px)",
     frameWallFrom: "#eef1f4",
     frameWallTo: "#c7cad0",
     frameTrim: "#94a3b8",
@@ -74,6 +77,7 @@ const THEME_PALETTES: Record<ElevatorTheme, ThemePalette> = {
     doorColorFrom: "#caa15a",
     doorColorTo: "#7a5222",
     doorHighlight: "rgba(255,238,196,0.6)",
+    doorTexture: "repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0 2px, transparent 2px 18px)",
     frameWallFrom: "#8a6136",
     frameWallTo: "#4a331c",
     frameTrim: "#f0c96b",
@@ -93,6 +97,7 @@ const THEME_PALETTES: Record<ElevatorTheme, ThemePalette> = {
     doorColorFrom: "#7c8aa0",
     doorColorTo: "#333d4d",
     doorHighlight: "rgba(165,243,252,0.65)",
+    doorTexture: "repeating-linear-gradient(0deg, rgba(165,243,252,0.16) 0 1px, transparent 1px 6px)",
     frameWallFrom: "#2d3b52",
     frameWallTo: "#121a2b",
     frameTrim: "#22d3ee",
