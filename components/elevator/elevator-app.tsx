@@ -2,8 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 import { CabinScene } from "./cabin-scene";
+import { CarLifecycle } from "./car-lifecycle";
 import { LobbyScene } from "./lobby-scene";
 import type { ElevatorTheme } from "./theme";
 import { useElevator } from "./use-elevator";
@@ -13,6 +15,8 @@ export interface ElevatorAppProps {
   topFloor: number;
   /** 이 건물의 지하 층수(0이면 지하 없음). */
   bottomFloor: number;
+  /** 이 건물의 엘리베이터 대수(1~4대). */
+  carCount: number;
   /** 엘리베이터 인테리어 분위기. */
   theme: ElevatorTheme;
   /** 로비에서 설정 버튼을 눌렀을 때. */
@@ -20,40 +24,87 @@ export interface ElevatorAppProps {
 }
 
 /**
- * 엘리베이터 한 바퀴 시뮬레이터의 공개 진입점.
- *
- * 호출부터 하차까지 상태 기계는 useElevator가 굴리고, 이 컴포넌트는
- * 지금 시점(view)에 맞춰 로비/캐빈 화면을 조합해 보여주기만 한다.
- * topFloor·bottomFloor는 마운트 시점의 값으로 고정되므로, 건물을 바꿀
- * 때는 이 컴포넌트를 다시 마운트한다(예: 상위에서 key를 바꿔준다).
+ * 대수가 늘어날수록 로비에 나란히 보이는 문이 늘어나므로, 좁은 카드 폭에
+ * 욱여넣지 않고 화면 가로 폭을 넉넉히 쓴다
+ * (docs/specs/multi-elevator-dispatch/spec.md "정해진 제약과 이유").
  */
-export function ElevatorApp({ topFloor, bottomFloor, theme, onOpenSettings }: ElevatorAppProps) {
-  const { state, call, selectFloor, pressOpenDoor, pressCloseDoor } = useElevator(
+const CARD_MAX_WIDTH_CLASS: Record<number, string> = {
+  1: "max-w-md",
+  2: "max-w-2xl",
+  3: "max-w-4xl",
+  4: "max-w-5xl",
+};
+
+/**
+ * 엘리베이터 시뮬레이터의 공개 진입점.
+ *
+ * 호출부터 하차까지, 그리고 배차·자율 운행까지 상태 기계는 useElevator가
+ * 굴리고, 카마다 필요한 타이머와 안내 소리는 카 개수만큼 렌더링하는
+ * CarLifecycle이 각자 담당한다. 이 컴포넌트는 지금 시점(view)에 맞춰
+ * 로비/캐빈 화면을 조합해 보여주기만 한다.
+ *
+ * topFloor·bottomFloor·carCount는 마운트 시점의 값으로 고정되므로, 건물을
+ * 바꿀 때는 이 컴포넌트를 다시 마운트한다(예: 상위에서 key를 바꿔준다).
+ */
+export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSettings }: ElevatorAppProps) {
+  const { state, dispatch, call, selectFloor, pressOpenDoor, pressCloseDoor } = useElevator(
     topFloor,
-    bottomFloor
+    bottomFloor,
+    carCount
   );
 
+  const activeCar = state.activeCarIndex !== null ? state.cars[state.activeCarIndex] : null;
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="flex-row items-center justify-between">
-        <h1 className="font-heading text-base font-medium">엘리베이터</h1>
-        <Badge variant={state.view === "lobby" ? "secondary" : "default"}>
-          {state.view === "lobby" ? "로비" : "탑승 중"}
-        </Badge>
-      </CardHeader>
-      <CardContent className="flex items-center justify-center pt-2 pb-6">
-        {state.view === "lobby" ? (
-          <LobbyScene state={state} theme={theme} onCall={call} onOpenSettings={onOpenSettings} />
-        ) : (
-          <CabinScene
-            state={state}
-            theme={theme}
-            onSelectFloor={selectFloor}
-            onPressOpenDoor={pressOpenDoor}
-            onPressCloseDoor={pressCloseDoor}
-          />
-        )}
-      </CardContent>
-    </Card>
+    <>
+      {state.cars.map((car, index) => (
+        <CarLifecycle
+          key={index}
+          car={car}
+          carIndex={index}
+          isActive={index === state.activeCarIndex}
+          standingFloor={state.standingFloor}
+          topFloor={topFloor}
+          bottomFloor={bottomFloor}
+          dispatch={dispatch}
+        />
+      ))}
+
+      <Card className={cn("w-full", CARD_MAX_WIDTH_CLASS[carCount] ?? "max-w-5xl")}>
+        <CardHeader className="flex-row items-center justify-between">
+          <h1 className="font-heading text-base font-medium">엘리베이터</h1>
+          <Badge variant={state.view === "lobby" ? "secondary" : "default"}>
+            {state.view === "lobby" ? "로비" : "탑승 중"}
+          </Badge>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center pt-2 pb-6">
+          {state.view === "lobby" ? (
+            <LobbyScene
+              cars={state.cars}
+              standingFloor={state.standingFloor}
+              topFloor={topFloor}
+              bottomFloor={bottomFloor}
+              activeCarIndex={state.activeCarIndex}
+              callActive={state.callActive}
+              theme={theme}
+              onCall={call}
+              onOpenSettings={onOpenSettings}
+            />
+          ) : (
+            activeCar && (
+              <CabinScene
+                car={activeCar}
+                topFloor={topFloor}
+                bottomFloor={bottomFloor}
+                theme={theme}
+                onSelectFloor={selectFloor}
+                onPressOpenDoor={pressOpenDoor}
+                onPressCloseDoor={pressCloseDoor}
+              />
+            )
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 }

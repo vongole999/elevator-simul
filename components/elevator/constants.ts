@@ -36,3 +36,12 @@ export const ALIGHTING_DOOR_WAIT_MS = 2000;
  * 수용 기준이 어색하지 않게 보인다.
  */
 export const DOOR_ANIMATION_MS = 900;
+
+/**
+ * 자율 운행 카가 idle 상태로 머무는 시간(ms)의 범위. 이 범위 안에서
+ * 무작위로 골라 대기한 뒤 다음 목적층으로 출발한다.
+ * docs/specs/multi-elevator-dispatch/spec.md 가정: "아이가 타는 차의 기존
+ * 문 열림 대기(4초 안팎)와 비슷한 감각으로 잡는다".
+ */
+export const AUTO_IDLE_MIN_WAIT_MS = 3000;
+export const AUTO_IDLE_MAX_WAIT_MS = 8000;

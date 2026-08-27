@@ -5,9 +5,16 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 
-import { MAX_BOTTOM_FLOOR, MAX_TOP_FLOOR, MIN_BOTTOM_FLOOR, MIN_TOP_FLOOR } from "./constants";
-import { FloorCountField } from "./floor-count-field";
+import {
+  MAX_BOTTOM_FLOOR,
+  MAX_ELEVATOR_COUNT,
+  MAX_TOP_FLOOR,
+  MIN_BOTTOM_FLOOR,
+  MIN_ELEVATOR_COUNT,
+  MIN_TOP_FLOOR,
+} from "./constants";
 import { LanguagePicker } from "./language-picker";
+import { StepperField } from "./stepper-field";
 import { ThemePicker } from "./theme-picker";
 import type { BuildingConfig } from "./types";
 
@@ -30,20 +37,27 @@ export function BuildingSetupScreen({ initialConfig, onStart }: BuildingSetupScr
         </p>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-        <div className="flex justify-center gap-10">
-          <FloorCountField
+        <div className="flex flex-wrap justify-center gap-x-10 gap-y-6">
+          <StepperField
             label="지상 층수"
             value={config.topFloor}
             min={MIN_TOP_FLOOR}
             max={MAX_TOP_FLOOR}
             onChange={(topFloor) => setConfig((c) => ({ ...c, topFloor }))}
           />
-          <FloorCountField
+          <StepperField
             label="지하 층수"
             value={config.bottomFloor}
             min={MIN_BOTTOM_FLOOR}
             max={MAX_BOTTOM_FLOOR}
             onChange={(bottomFloor) => setConfig((c) => ({ ...c, bottomFloor }))}
+          />
+          <StepperField
+            label="엘리베이터 대수"
+            value={config.elevatorCount}
+            min={MIN_ELEVATOR_COUNT}
+            max={MAX_ELEVATOR_COUNT}
+            onChange={(elevatorCount) => setConfig((c) => ({ ...c, elevatorCount }))}
           />
         </div>
 

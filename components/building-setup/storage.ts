@@ -1,6 +1,13 @@
 import { ELEVATOR_THEMES } from "@/components/elevator/theme";
 
-import { MAX_BOTTOM_FLOOR, MAX_TOP_FLOOR, MIN_BOTTOM_FLOOR, MIN_TOP_FLOOR } from "./constants";
+import {
+  MAX_BOTTOM_FLOOR,
+  MAX_ELEVATOR_COUNT,
+  MAX_TOP_FLOOR,
+  MIN_BOTTOM_FLOOR,
+  MIN_ELEVATOR_COUNT,
+  MIN_TOP_FLOOR,
+} from "./constants";
 import type { BuildingConfig } from "./types";
 
 const STORAGE_KEY = "elevator-simul:building-config";
@@ -22,7 +29,7 @@ function isValidConfig(value: unknown): value is BuildingConfig {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Record<string, unknown>;
 
-  const { topFloor, bottomFloor, theme, language } = candidate;
+  const { topFloor, bottomFloor, elevatorCount, theme, language } = candidate;
   return (
     typeof topFloor === "number" &&
     topFloor >= MIN_TOP_FLOOR &&
@@ -30,6 +37,9 @@ function isValidConfig(value: unknown): value is BuildingConfig {
     typeof bottomFloor === "number" &&
     bottomFloor >= MIN_BOTTOM_FLOOR &&
     bottomFloor <= MAX_BOTTOM_FLOOR &&
+    typeof elevatorCount === "number" &&
+    elevatorCount >= MIN_ELEVATOR_COUNT &&
+    elevatorCount <= MAX_ELEVATOR_COUNT &&
     (ELEVATOR_THEMES as readonly unknown[]).includes(theme) &&
     (language === "ko" || language === "en")
   );

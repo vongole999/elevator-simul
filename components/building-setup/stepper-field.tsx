@@ -2,7 +2,7 @@ import { Minus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-interface FloorCountFieldProps {
+interface StepperFieldProps {
   label: string;
   value: number;
   min: number;
@@ -10,8 +10,8 @@ interface FloorCountFieldProps {
   onChange: (value: number) => void;
 }
 
-/** 지상·지하 층수를 +/- 버튼으로 한 층씩 정하는 스테퍼. */
-export function FloorCountField({ label, value, min, max, onChange }: FloorCountFieldProps) {
+/** 숫자 값을 +/- 버튼으로 한 단위씩 정하는 스테퍼. 층수·대수 등 값의 종류와 무관하게 쓴다. */
+export function StepperField({ label, value, min, max, onChange }: StepperFieldProps) {
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="text-sm text-muted-foreground">{label}</span>

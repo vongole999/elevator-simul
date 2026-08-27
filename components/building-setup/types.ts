@@ -9,6 +9,8 @@ export interface BuildingConfig {
   topFloor: number;
   /** 지하 층수(0이면 지하 없음). */
   bottomFloor: number;
+  /** 엘리베이터 대수(1~4대). */
+  elevatorCount: number;
   theme: ElevatorTheme;
   language: Language;
 }

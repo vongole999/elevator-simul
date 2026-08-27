@@ -6,10 +6,13 @@ import { formatFloorLabel } from "./floor-format";
 import { isDoorsOpen } from "./machine";
 import { PanelButton } from "./panel-button";
 import type { ElevatorTheme } from "./theme";
-import type { ElevatorState } from "./types";
+import type { CarState } from "./types";
 
 interface CabinSceneProps {
-  state: ElevatorState;
+  /** 지금 아이가 타고 있는 카. */
+  car: CarState;
+  topFloor: number;
+  bottomFloor: number;
   theme: ElevatorTheme;
   onSelectFloor: (floor: number) => void;
   onPressOpenDoor: () => void;
@@ -26,35 +29,36 @@ function buildFloorNumbers(topFloor: number, bottomFloor: number): number[] {
 
 /** 엘리베이터 안에서 문을 바라보는 시점. */
 export function CabinScene({
-  state,
+  car,
+  topFloor,
+  bottomFloor,
   theme,
   onSelectFloor,
   onPressOpenDoor,
   onPressCloseDoor,
 }: CabinSceneProps) {
-  const canSelectFloor =
-    state.phase === "boardingDoorsOpen" || state.phase === "closedWaitingForFloor";
-  const canPressOpen = state.phase === "doorsClosing" || state.phase === "closedWaitingForFloor";
-  const canPressClose = state.phase === "boardingDoorsOpen" || state.phase === "closeCountdown";
-  const floorNumbers = buildFloorNumbers(state.topFloor, state.bottomFloor);
+  const canSelectFloor = car.phase === "boardingDoorsOpen" || car.phase === "closedWaitingForFloor";
+  const canPressOpen = car.phase === "doorsClosing" || car.phase === "closedWaitingForFloor";
+  const canPressClose = car.phase === "boardingDoorsOpen" || car.phase === "closeCountdown";
+  const floorNumbers = buildFloorNumbers(topFloor, bottomFloor);
 
   return (
     <div className="flex w-full max-w-sm flex-col items-center gap-6">
       <p className="text-sm text-muted-foreground">엘리베이터 안</p>
 
-      <DoorPanel open={isDoorsOpen(state.phase)} theme={theme} scene="cabin" className="max-w-xs" />
+      <DoorPanel open={isDoorsOpen(car.phase)} theme={theme} scene="cabin" className="max-w-xs" />
 
-      <FloorIndicator floor={state.carFloor} direction={state.travelDirection} theme={theme} />
+      <FloorIndicator floor={car.carFloor} direction={car.travelDirection} theme={theme} />
 
       <div className="grid w-full grid-cols-7 gap-1.5" role="group" aria-label="층 버튼">
         {floorNumbers.map((floor) => (
           <PanelButton
             key={floor}
             size="sm"
-            active={state.destinationFloor === floor}
-            disabled={!canSelectFloor || floor === state.carFloor}
+            active={car.destinationFloor === floor}
+            disabled={!canSelectFloor || floor === car.carFloor}
             onClick={() => onSelectFloor(floor)}
-            aria-pressed={state.destinationFloor === floor}
+            aria-pressed={car.destinationFloor === floor}
             aria-label={`${formatFloorLabel(floor)}층 버튼`}
           >
             {formatFloorLabel(floor)}
