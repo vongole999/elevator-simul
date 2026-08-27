@@ -18,7 +18,7 @@ export interface ElevatorAppProps {
   topFloor: number;
   /** 이 건물의 지하 층수(0이면 지하 없음). */
   bottomFloor: number;
-  /** 이 건물의 엘리베이터 대수(1~4대). */
+  /** 이 건물의 엘리베이터 대수(1~6대). */
   carCount: number;
   /** 엘리베이터 인테리어 분위기. */
   theme: ElevatorTheme;
@@ -36,6 +36,8 @@ const CARD_MAX_WIDTH_CLASS: Record<number, string> = {
   2: "max-w-2xl",
   3: "max-w-4xl",
   4: "max-w-5xl",
+  5: "max-w-6xl",
+  6: "max-w-7xl",
 };
 
 /**
@@ -62,6 +64,12 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
   // (docs/specs/building-setup/spec.md "가정").
   const canOpenSettings = state.view === "lobby" && state.activeCarIndex === null;
   const title = state.view === "lobby" ? `${formatFloorWord(state.standingFloor)} 로비` : "엘리베이터";
+  // 로비는 대수만큼 늘어서는 문 개수에 맞춰 폭을 정하지만, 캐빈은 언제나
+  // 카 1대만 보여준다. 대신 층 버튼이 최대 220개(지상 200+지하 20)까지
+  // 늘어날 수 있으니, 대수와 무관하게 늘 넉넉한 폭을 써서 버튼이 가로로
+  // 넓게 펼쳐지게 한다.
+  const cardWidthClass =
+    state.view === "cabin" ? "max-w-5xl" : (CARD_MAX_WIDTH_CLASS[carCount] ?? "max-w-5xl");
 
   return (
     <>
@@ -78,7 +86,7 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
         />
       ))}
 
-      <Card className={cn("w-full", CARD_MAX_WIDTH_CLASS[carCount] ?? "max-w-5xl")}>
+      <Card className={cn("w-full", cardWidthClass)}>
         <CardHeader className="flex-row items-center justify-between">
           <h1 className="font-heading text-base font-medium">{title}</h1>
           {canOpenSettings && (
@@ -88,7 +96,7 @@ export function ElevatorApp({ topFloor, bottomFloor, carCount, theme, onOpenSett
             </Button>
           )}
         </CardHeader>
-        <CardContent className="flex items-center justify-center pt-2 pb-6">
+        <CardContent className="flex items-center justify-center pt-2 pb-4">
           {state.view === "lobby" ? (
             <LobbyScene
               cars={state.cars}

@@ -19,8 +19,8 @@ interface LobbySceneProps {
   onCall: (direction: Direction) => void;
 }
 
-/** 대수만큼의 카를 가리키는 레이블. 5대 이상은 스펙 범위 밖(최대 4대)이라 그 경우에만 숫자로 대체한다. */
-const CAR_LABELS = ["A", "B", "C", "D"];
+/** 대수만큼의 카를 가리키는 레이블(최대 6대). */
+const CAR_LABELS = ["A", "B", "C", "D", "E", "F"];
 
 /** 아이가 서 있는 층의 로비에서 엘리베이터 문(들)을 바라보는 시점. */
 export function LobbyScene({

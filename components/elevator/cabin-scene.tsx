@@ -20,8 +20,8 @@ interface CabinSceneProps {
   onPressCloseDoor: () => void;
 }
 
-/** 로비와 같은 규칙(A, B, C, D)으로 카를 가리킨다. */
-const CAR_LABELS = ["A", "B", "C", "D"];
+/** 로비와 같은 규칙(A, B, C, D, E, F)으로 카를 가리킨다. */
+const CAR_LABELS = ["A", "B", "C", "D", "E", "F"];
 
 /** 최상층부터 1층, 그다음 지하 1층부터 최하층까지 순서로 층 버튼 목록을 만든다(0층은 없다). */
 function buildFloorNumbers(topFloor: number, bottomFloor: number): number[] {
@@ -49,32 +49,48 @@ export function CabinScene({
   const label = CAR_LABELS[carIndex] ?? String(carIndex + 1);
 
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-6">
-      <ElevatorBay
-        theme={theme}
-        open={isDoorsOpen(car.phase)}
-        scene="cabin"
-        carFloor={car.carFloor}
-        direction={car.travelDirection}
-        label={label}
-        className="max-w-xs"
-      />
+    <div className="flex w-full flex-col items-center gap-4">
+      {/* 문은 세로로 긴 모양을 유지하고, 층 버튼은 그 옆 가로 공간을 넉넉히
+          쓰게 나란히 배치한다. 층수 최댓값이 커서 버튼이 최대 220개까지
+          늘어날 수 있으므로, 버튼 영역만 정해진 높이 안에서 스크롤하게
+          하고 문·표시기·문 조작 버튼은 항상 화면에 고정해 보이게 한다. */}
+      <div className="flex w-full flex-col items-center gap-4 md:flex-row md:items-start md:justify-center">
+        <ElevatorBay
+          theme={theme}
+          open={isDoorsOpen(car.phase)}
+          scene="cabin"
+          carFloor={car.carFloor}
+          direction={car.travelDirection}
+          label={label}
+          className="w-full max-w-[200px] shrink-0"
+        />
 
-      <div className="grid w-full grid-cols-7 gap-1.5" role="group" aria-label="층 버튼">
-        {floorNumbers.map((floor) => (
-          <PanelButton
-            key={floor}
-            size="sm"
-            theme={theme}
-            active={car.destinationFloor === floor}
-            disabled={!canSelectFloor || floor === car.carFloor}
-            onClick={() => onSelectFloor(floor)}
-            aria-pressed={car.destinationFloor === floor}
-            aria-label={`${formatFloorLabel(floor)}층 버튼`}
-          >
-            {formatFloorLabel(floor)}
-          </PanelButton>
-        ))}
+        {/* 열 개수를 브레이크포인트로 못박지 않고 auto-fill로 컨테이너
+            폭에 맞춰 계산한다 — 버튼(size-9=2.25rem)이 고정폭이라
+            grid-cols-N처럼 열 개수를 고정하면 좁은 화면에서 버튼이 셀보다
+            커져 가로로 넘칠 수 있기 때문이다. 트랙 폭을 버튼 폭과 똑같이
+            고정해 두면(min=max) 화면이 넓어질수록 열 개수만 늘어나고
+            버튼 크기는 항상 일정하게 유지된다. */}
+        <div
+          className="grid w-full max-h-[32vh] justify-center gap-1.5 overflow-x-hidden overflow-y-auto p-1 md:max-h-[280px] md:flex-1 md:justify-start [grid-template-columns:repeat(auto-fill,minmax(2.25rem,2.25rem))]"
+          role="group"
+          aria-label="층 버튼"
+        >
+          {floorNumbers.map((floor) => (
+            <PanelButton
+              key={floor}
+              size="sm"
+              theme={theme}
+              active={car.destinationFloor === floor}
+              disabled={!canSelectFloor || floor === car.carFloor}
+              onClick={() => onSelectFloor(floor)}
+              aria-pressed={car.destinationFloor === floor}
+              aria-label={`${formatFloorLabel(floor)}층 버튼`}
+            >
+              {formatFloorLabel(floor)}
+            </PanelButton>
+          ))}
+        </div>
       </div>
 
       <div className="flex gap-6" role="group" aria-label="문 조작 버튼">
