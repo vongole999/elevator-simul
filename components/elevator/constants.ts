@@ -1,9 +1,8 @@
 /**
  * 이동 관련 상수.
  *
- * 값의 근거는 docs/specs/single-elevator-round-trip/spec.md의
- * "정해진 제약과 이유"·"가정" 절을 따른다. 건물의 지상·지하 층수는
- * 더 이상 고정값이 아니라 building-setup에서 정한 값을 받는다.
+ * 값의 근거는 docs/decisions/floor-numbering.md를 따른다. 건물의 지상·지하
+ * 층수는 고정값이 아니라 building-setup에서 정한 값을 받는다.
  */
 
 /** 아이와 엘리베이터가 항상 함께 시작하는 층. */
@@ -17,9 +16,9 @@ export const START_FLOOR = 1;
 export const FLOOR_TRAVEL_MS = 900;
 
 /**
- * 문이 열린 채로 대기하는 시간(ms).
- * spec.md 가정: "문이 열린 채 기다리는 시간은 4초 안팎".
- * 승차 대기, 목적층 선택 후 자동 닫힘 대기, 하차 대기에 공통으로 쓴다.
+ * 문이 열린 채로 대기하는 시간(ms). 아이가 반응할 시간을 감안해 4초
+ * 안팎으로 잡았다. 승차 대기, 목적층 선택 후 자동 닫힘 대기, 하차 대기에
+ * 공통으로 쓴다.
  */
 export const DOORS_OPEN_WAIT_MS = 4000;
 
@@ -30,18 +29,16 @@ export const DOORS_OPEN_WAIT_MS = 4000;
 export const ALIGHTING_DOOR_WAIT_MS = 2000;
 
 /**
- * 문이 여닫히는 애니메이션 자체의 소요 시간(ms).
- * spec.md에 수치가 없어 자유롭게 정한 값이다. 문 열림/닫힘 버튼의 CSS
- * transition 시간과 반드시 같은 값을 써야 "닫히던 문이 다시 열린다"는
- * 수용 기준이 어색하지 않게 보인다.
+ * 문이 여닫히는 애니메이션 자체의 소요 시간(ms). 정확한 근거값은 없고
+ * 자유롭게 정했다. 문 열림/닫힘 버튼의 CSS transition 시간과 반드시 같은
+ * 값을 써야 "닫히던 문이 다시 열린다"는 동작이 어색하지 않게 보인다.
  */
 export const DOOR_ANIMATION_MS = 900;
 
 /**
  * 자율 운행 카가 idle 상태로 머무는 시간(ms)의 범위. 이 범위 안에서
  * 무작위로 골라 대기한 뒤 다음 목적층으로 출발한다.
- * docs/specs/multi-elevator-dispatch/spec.md 가정: "아이가 타는 차의 기존
- * 문 열림 대기(4초 안팎)와 비슷한 감각으로 잡는다".
+ * 근거는 docs/decisions/elevator-dispatch.md에 있다.
  */
 export const AUTO_IDLE_MIN_WAIT_MS = 3000;
 export const AUTO_IDLE_MAX_WAIT_MS = 8000;

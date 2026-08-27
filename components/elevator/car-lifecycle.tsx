@@ -39,7 +39,7 @@ export interface CarLifecycleProps {
  *
  * 소리는 isActive일 때만 낸다 — 자율 운행 카가 동시에 여러 대 움직여도
  * 안내 음성이 겹치지 않게 하기 위해서다
- * (docs/specs/multi-elevator-dispatch/spec.md).
+ * (docs/decisions/elevator-dispatch.md).
  */
 export function CarLifecycle({
   car,

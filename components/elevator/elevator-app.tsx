@@ -31,8 +31,7 @@ export interface ElevatorAppProps {
 
 /**
  * 대수가 늘어날수록 로비에 나란히 보이는 문이 늘어나므로, 좁은 카드 폭에
- * 욱여넣지 않고 화면 가로 폭을 넉넉히 쓴다
- * (docs/specs/multi-elevator-dispatch/spec.md "정해진 제약과 이유").
+ * 욱여넣지 않고 화면 가로 폭을 넉넉히 쓴다 (docs/decisions/elevator-dispatch.md).
  */
 const CARD_MAX_WIDTH_CLASS: Record<number, string> = {
   1: "max-w-md",
@@ -72,7 +71,7 @@ export function ElevatorApp({
   const activeCar = state.activeCarIndex !== null ? state.cars[state.activeCarIndex] : null;
   // 설정 화면으로 돌아가는 것은 호출을 기다리는 동안에만 허용한다 — 엘리베이터가
   // 응답하는 중에 건물을 바꾸면 진행 중이던 동작이 애매해진다
-  // (docs/specs/building-setup/spec.md "가정").
+  // (docs/decisions/building-config-persistence.md).
   const canOpenSettings = state.view === "lobby" && state.activeCarIndex === null;
   const title = state.view === "lobby" ? `${formatFloorWord(state.standingFloor)} 로비` : "엘리베이터";
   // 로비는 대수만큼 늘어서는 문 개수에 맞춰 폭을 정하지만, 캐빈은 언제나

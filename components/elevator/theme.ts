@@ -1,7 +1,7 @@
 /**
  * 엘리베이터 인테리어 분위기.
  *
- * 종류와 근거는 docs/specs/building-setup/spec.md를 따른다. 색상만 여기
+ * 종류와 근거는 docs/decisions/interior-theme.md를 따른다. 색상만 여기
  * 데이터로 갖고, 문·버튼·배경의 "모양(shape)" 차이는 그 모양을 그리는
  * 컴포넌트(panel-button.tsx, door-panel.tsx, lobby-backdrop.tsx 등)가 이
  * theme 값을 직접 보고 결정한다 — 분위기라는 하나의 개념이 여러 시각

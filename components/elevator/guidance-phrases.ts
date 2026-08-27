@@ -4,8 +4,8 @@
  * 한 바퀴 곳곳(car-lifecycle.tsx, use-elevator.ts)에서 speak()에 넘길
  * 문구를 여기 모아 둔다. 언어가 하나뿐일 때는 호출부에 문자열을 직접 써도
  * 됐지만, 언어마다 두 벌씩 필요해지면서 한 곳에 모으지 않으면 새 언어를
- * 추가하거나 문구를 고칠 때 여러 파일을 빠짐없이 고쳐야 한다
- * (docs/specs/english-guidance-voice/spec.md).
+ * 추가하거나 문구를 고칠 때 여러 파일을 빠짐없이 고쳐야 한다. 언어별 문구
+ * 목록의 근거는 docs/decisions/guidance-sound.md에 있다.
  */
 import { formatFloorSpeech } from "./floor-format";
 import type { Direction, Language } from "./types";

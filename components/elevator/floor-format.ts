@@ -13,7 +13,7 @@ export function formatFloorLabel(floor: number): string {
 /**
  * 안내 음성에서 층을 읽는 방식. 화면 표기(B2)를 글자 그대로 읽지 않고
  * "지하 2층"/"Basement 2"처럼 각 언어로 자연스럽게 읽는다
- * (docs/specs/english-guidance-voice/spec.md "가정").
+ * (docs/decisions/guidance-sound.md).
  */
 export function formatFloorSpeech(floor: number, language: Language): string {
   if (language === "en") {

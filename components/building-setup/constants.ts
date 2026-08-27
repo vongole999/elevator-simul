@@ -11,7 +11,7 @@ export const MAX_BOTTOM_FLOOR = 20;
 
 /**
  * 엘리베이터 대수 선택 범위.
- * 근거는 docs/specs/multi-elevator-dispatch/spec.md에 있다.
+ * 근거는 docs/decisions/elevator-dispatch.md에 있다.
  */
 export const MIN_ELEVATOR_COUNT = 1;
 export const MAX_ELEVATOR_COUNT = 6;
