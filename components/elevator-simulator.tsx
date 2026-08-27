@@ -35,9 +35,10 @@ export function ElevatorSimulator() {
   return (
     <ElevatorApp
       // 건물이 바뀔 때마다 게임을 처음부터 다시 시작하도록 새로 마운트한다.
-      key={`${savedConfig.topFloor}-${savedConfig.bottomFloor}-${savedConfig.theme}`}
+      key={`${savedConfig.topFloor}-${savedConfig.bottomFloor}-${savedConfig.elevatorCount}-${savedConfig.theme}`}
       topFloor={savedConfig.topFloor}
       bottomFloor={savedConfig.bottomFloor}
+      carCount={savedConfig.elevatorCount}
       theme={savedConfig.theme}
       onOpenSettings={() => setReopenedSetup(true)}
     />

@@ -26,7 +26,7 @@ describe("ElevatorSimulator", () => {
   });
 
   it("저장된 건물이 있으면 설정 화면 없이 곧바로 그 건물에서 시작한다", () => {
-    saveBuildingConfig({ topFloor: 15, bottomFloor: 2, theme: "spaceship", language: "en" });
+    saveBuildingConfig({ topFloor: 15, bottomFloor: 2, elevatorCount: 1, theme: "spaceship", language: "en" });
 
     render(<ElevatorSimulator />);
 
@@ -37,7 +37,7 @@ describe("ElevatorSimulator", () => {
   });
 
   it("로비에서 설정 버튼을 누르면 다시 설정 화면으로 돌아가고 지난 값이 채워져 있다", () => {
-    saveBuildingConfig({ topFloor: 12, bottomFloor: 1, theme: "classic", language: "ko" });
+    saveBuildingConfig({ topFloor: 12, bottomFloor: 1, elevatorCount: 3, theme: "classic", language: "ko" });
     render(<ElevatorSimulator />);
 
     fireEvent.click(screen.getByRole("button", { name: "건물 설정으로 돌아가기" }));
