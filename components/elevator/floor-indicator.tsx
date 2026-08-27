@@ -2,9 +2,9 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+import { DotMatrixDisplay } from "./dot-matrix-display";
 import { formatFloorWord } from "./floor-format";
 import { getThemePalette, type ElevatorTheme } from "./theme";
-import { SevenSegmentDisplay } from "./seven-segment-display";
 import type { Direction } from "./types";
 
 interface FloorIndicatorProps {
@@ -16,10 +16,11 @@ interface FloorIndicatorProps {
 
 /**
  * 로비·캐빈 양쪽에서 함께 쓰는 층 표시기. 카가 지금 있는 층을 실제
- * 엘리베이터의 7세그먼트 디스플레이처럼 보여준다.
+ * 엘리베이터의 점 격자(도트매트릭스) 디스플레이처럼 보여준다.
  *
- * 지하는 "B" + 숫자를 통째로 세그먼트로 그린다(seven-segment-display.tsx
- * 참고). B는 소문자 b 모양으로 그려지지만 실제 엘리베이터 표시 관행과 같다.
+ * 지하는 "B" + 숫자를 통째로 같은 도트매트릭스로 그린다
+ * (dot-matrix-display.tsx 참고). 점 격자는 세그먼트와 달리 대문자 B를
+ * 8과 다른 모양(오른쪽만 볼록한 실제 B 모양) 그대로 그릴 수 있다.
  */
 export function FloorIndicator({ floor, direction, theme, className }: FloorIndicatorProps) {
   const palette = getThemePalette(theme);
@@ -42,7 +43,7 @@ export function FloorIndicator({ floor, direction, theme, className }: FloorIndi
         {direction === "up" && <ArrowUp className="size-4 animate-pulse" />}
         {direction === "down" && <ArrowDown className="size-4 animate-pulse" />}
       </span>
-      <SevenSegmentDisplay text={digits} className="[filter:drop-shadow(0_0_5px_currentColor)]" />
+      <DotMatrixDisplay text={digits} className="[filter:drop-shadow(0_0_5px_currentColor)]" />
     </div>
   );
 }
