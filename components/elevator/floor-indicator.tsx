@@ -18,14 +18,13 @@ interface FloorIndicatorProps {
  * 로비·캐빈 양쪽에서 함께 쓰는 층 표시기. 카가 지금 있는 층을 실제
  * 엘리베이터의 7세그먼트 디스플레이처럼 보여준다.
  *
- * 지하는 세그먼트 폰트로 그리면 소문자 b로만 보여(seven-segment-display.tsx
- * 참고) "B"가 대문자로 읽히지 않으므로, B는 일반 글자로 따로 그리고
- * 세그먼트에는 숫자만 태운다.
+ * 지하는 "B" + 숫자를 통째로 세그먼트로 그린다(seven-segment-display.tsx
+ * 참고). B는 소문자 b 모양으로 그려지지만 실제 엘리베이터 표시 관행과 같다.
  */
 export function FloorIndicator({ floor, direction, theme, className }: FloorIndicatorProps) {
   const palette = getThemePalette(theme);
   const isBasement = floor < 0;
-  const digits = isBasement ? String(-floor) : String(floor);
+  const digits = isBasement ? `B${-floor}` : String(floor).padStart(2, " ");
   const floorWord = formatFloorWord(floor);
 
   return (
@@ -43,18 +42,7 @@ export function FloorIndicator({ floor, direction, theme, className }: FloorIndi
         {direction === "up" && <ArrowUp className="size-4 animate-pulse" />}
         {direction === "down" && <ArrowDown className="size-4 animate-pulse" />}
       </span>
-      {isBasement && (
-        <span
-          className="font-mono text-xl leading-none font-bold [filter:drop-shadow(0_0_5px_currentColor)]"
-          aria-hidden
-        >
-          B
-        </span>
-      )}
-      <SevenSegmentDisplay
-        text={isBasement ? digits : digits.padStart(2, " ")}
-        className="[filter:drop-shadow(0_0_5px_currentColor)]"
-      />
+      <SevenSegmentDisplay text={digits} className="[filter:drop-shadow(0_0_5px_currentColor)]" />
     </div>
   );
 }
