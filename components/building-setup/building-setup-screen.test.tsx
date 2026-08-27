@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { BuildingSetupScreen } from "./building-setup-screen";
-import { DEFAULT_BUILDING_CONFIG } from "./constants";
+import { DEFAULT_BUILDING_CONFIG, MAX_ELEVATOR_COUNT, MAX_TOP_FLOOR } from "./constants";
 
 describe("BuildingSetupScreen", () => {
   it("지상 층수 늘리기 버튼을 누르면 숫자가 하나 올라간다", () => {
@@ -19,10 +19,10 @@ describe("BuildingSetupScreen", () => {
     expect(screen.getByRole("button", { name: "지하 층수 줄이기" })).toBeDisabled();
   });
 
-  it("지상 층수는 최댓값(30)에서 늘리기 버튼이 비활성화된다", () => {
+  it("지상 층수는 최댓값에서 늘리기 버튼이 비활성화된다", () => {
     render(
       <BuildingSetupScreen
-        initialConfig={{ ...DEFAULT_BUILDING_CONFIG, topFloor: 30 }}
+        initialConfig={{ ...DEFAULT_BUILDING_CONFIG, topFloor: MAX_TOP_FLOOR }}
         onStart={() => {}}
       />
     );
@@ -39,10 +39,10 @@ describe("BuildingSetupScreen", () => {
     expect(screen.getByRole("radio", { name: "모던" })).toHaveAttribute("aria-checked", "false");
   });
 
-  it("엘리베이터 대수 늘리기 버튼을 누르면 숫자가 하나 올라가고, 4에서 비활성화된다", () => {
+  it("엘리베이터 대수 늘리기 버튼을 누르면 숫자가 하나 올라가고, 최댓값에서 비활성화된다", () => {
     render(
       <BuildingSetupScreen
-        initialConfig={{ ...DEFAULT_BUILDING_CONFIG, elevatorCount: 3 }}
+        initialConfig={{ ...DEFAULT_BUILDING_CONFIG, elevatorCount: MAX_ELEVATOR_COUNT - 1 }}
         onStart={() => {}}
       />
     );

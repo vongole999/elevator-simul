@@ -29,15 +29,17 @@ export function BuildingSetupScreen({ initialConfig, onStart }: BuildingSetupScr
   const [config, setConfig] = useState(initialConfig);
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-4xl">
       <CardHeader>
         <h1 className="font-heading text-base font-medium">건물 만들기</h1>
         <p className="text-sm text-muted-foreground">
           층수와 분위기를 정하고 엘리베이터 놀이를 시작하세요.
         </p>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
-        <div className="flex flex-wrap justify-center gap-x-10 gap-y-6">
+      {/* 넓은 화면에서는 스테퍼와 분위기·언어를 좌우로 나눠 상하 길이를
+          줄인다. 좁은 화면에서는 기존처럼 위아래로 쌓인다. */}
+      <CardContent className="flex flex-col gap-5 md:flex-row md:items-start md:gap-10">
+        <div className="flex flex-1 flex-wrap justify-center gap-x-8 gap-y-4 md:justify-start">
           <StepperField
             label="지상 층수"
             value={config.topFloor}
@@ -61,20 +63,22 @@ export function BuildingSetupScreen({ initialConfig, onStart }: BuildingSetupScr
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">엘리베이터 분위기</span>
-          <ThemePicker
-            value={config.theme}
-            onChange={(theme) => setConfig((c) => ({ ...c, theme }))}
-          />
-        </div>
+        <div className="flex flex-1 flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">엘리베이터 분위기</span>
+            <ThemePicker
+              value={config.theme}
+              onChange={(theme) => setConfig((c) => ({ ...c, theme }))}
+            />
+          </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium">안내 언어</span>
-          <LanguagePicker
-            value={config.language}
-            onChange={(language) => setConfig((c) => ({ ...c, language }))}
-          />
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">안내 언어</span>
+            <LanguagePicker
+              value={config.language}
+              onChange={(language) => setConfig((c) => ({ ...c, language }))}
+            />
+          </div>
         </div>
       </CardContent>
       <CardFooter>
