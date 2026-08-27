@@ -45,3 +45,14 @@ export const DOOR_ANIMATION_MS = 900;
  */
 export const AUTO_IDLE_MIN_WAIT_MS = 3000;
 export const AUTO_IDLE_MAX_WAIT_MS = 8000;
+
+/**
+ * 대수만큼의 카를 가리키는 레이블(최대 6대). 로비 화면과 캐빈 화면이
+ * 같은 규칙으로 카를 가리켜야 해서 여기 한 곳에 둔다.
+ */
+export const CAR_LABELS = ["A", "B", "C", "D", "E", "F"];
+
+/** 카 인덱스에 대응하는 레이블. 레이블 개수(6)를 넘는 인덱스는 1부터 시작하는 숫자로 대체한다. */
+export function getCarLabel(index: number): string {
+  return CAR_LABELS[index] ?? String(index + 1);
+}

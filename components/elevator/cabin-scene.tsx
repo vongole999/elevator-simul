@@ -1,5 +1,6 @@
 import { DoorClosed, DoorOpen } from "lucide-react";
 
+import { getCarLabel } from "./constants";
 import { ElevatorBay } from "./elevator-bay";
 import { formatFloorLabel } from "./floor-format";
 import { isDoorsOpen } from "./machine";
@@ -19,9 +20,6 @@ interface CabinSceneProps {
   onPressOpenDoor: () => void;
   onPressCloseDoor: () => void;
 }
-
-/** 로비와 같은 규칙(A, B, C, D, E, F)으로 카를 가리킨다. */
-const CAR_LABELS = ["A", "B", "C", "D", "E", "F"];
 
 /** 최상층부터 1층, 그다음 지하 1층부터 최하층까지 순서로 층 버튼 목록을 만든다(0층은 없다). */
 function buildFloorNumbers(topFloor: number, bottomFloor: number): number[] {
@@ -46,7 +44,7 @@ export function CabinScene({
   const canPressOpen = car.phase === "doorsClosing" || car.phase === "closedWaitingForFloor";
   const canPressClose = car.phase === "boardingDoorsOpen" || car.phase === "closeCountdown";
   const floorNumbers = buildFloorNumbers(topFloor, bottomFloor);
-  const label = CAR_LABELS[carIndex] ?? String(carIndex + 1);
+  const label = getCarLabel(carIndex);
 
   return (
     <div className="flex w-full flex-col items-center gap-4">

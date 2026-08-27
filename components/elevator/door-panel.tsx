@@ -17,7 +17,14 @@ interface DoorPanelProps {
   className?: string;
 }
 
-/** 문이 열렸을 때 캐빈 안쪽에서 보이는 벽. 분위기마다 재질과 장식을 다르게 그린다. */
+/**
+ * 문이 열렸을 때 캐빈 안쪽에서 보이는 벽. 분위기마다 재질과 장식을 다르게 그린다.
+ *
+ * 색상·텍스처처럼 순수 데이터로 뽑을 수 있는 값은 theme.ts의 팔레트에 있지만,
+ * 여기 장식은 테마마다 그리는 그림의 구조 자체(엘리먼트 개수·배치)가 달라
+ * 데이터화하지 않고 그대로 분기로 둔다(theme.ts 상단 설계 원칙). 새 테마를
+ * 추가할 때는 이 분기와 아래 DoorPanel의 좌우 문짝 장식 분기를 함께 챙긴다.
+ */
 function CabinBackdrop({ theme, palette }: { theme: ElevatorTheme; palette: ThemePalette }) {
   return (
     <div
@@ -118,11 +125,7 @@ export function DoorPanel({ open, theme, scene, floor = 1, riderVisible = false,
   const doorSurface = {
     backgroundImage: [
       `linear-gradient(100deg, transparent 0%, ${palette.doorHighlight} 45%, transparent 60%)`,
-      theme === "modern"
-        ? "repeating-linear-gradient(90deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 5px)"
-        : theme === "classic"
-          ? "repeating-linear-gradient(90deg, rgba(0,0,0,0.15) 0 2px, transparent 2px 18px)"
-          : "repeating-linear-gradient(0deg, rgba(165,243,252,0.16) 0 1px, transparent 1px 6px)",
+      palette.doorTexture,
       `linear-gradient(135deg, ${palette.doorColorFrom}, ${palette.doorColorTo})`,
     ].join(", "),
   };

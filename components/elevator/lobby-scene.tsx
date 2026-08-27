@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp } from "lucide-react";
 
+import { getCarLabel } from "./constants";
 import { ElevatorBay } from "./elevator-bay";
 import { isDoorsOpen } from "./machine";
 import { PanelButton } from "./panel-button";
@@ -18,9 +19,6 @@ interface LobbySceneProps {
   theme: ElevatorTheme;
   onCall: (direction: Direction) => void;
 }
-
-/** 대수만큼의 카를 가리키는 레이블(최대 6대). */
-const CAR_LABELS = ["A", "B", "C", "D", "E", "F"];
 
 /** 아이가 서 있는 층의 로비에서 엘리베이터 문(들)을 바라보는 시점. */
 export function LobbyScene({
@@ -47,7 +45,7 @@ export function LobbyScene({
           <CarDoor
             key={index}
             car={car}
-            label={CAR_LABELS[index] ?? String(index + 1)}
+            label={getCarLabel(index)}
             standingFloor={standingFloor}
             theme={theme}
           />
